@@ -1,0 +1,20 @@
+# Maven stuff
+target/
+
+# Eclipse stuff
+.classpath
+.project
+.settings/
+
+# IntelliJ stuff
+.idea/
+.iml/
+*.iml
+
+# Application output
+logs/
+*.csv
+*.DS_STORE
+
+# Application log files
+*.log

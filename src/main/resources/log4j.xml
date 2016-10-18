@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- Log4j configuration with two appenders; one for console and one for file; both are used by default -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+
+    <!-- Console Appender -->
+    <appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%-5p] %c:%L - %m%n"/>
+        </layout>
+    </appender>
+
+    <!-- File Appender -->
+    <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="file" value="MediaPlayer.log" />
+        <param name="MaxBackupIndex" value="10" />
+        <param name="MaxFileSize" value="10MB" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%-5p] %c:%L - %m%n" />
+        </layout>
+    </appender>
+
+    <root>
+        <priority value ="debug"/>
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="fileAppender"/>
+    </root>
+
+</log4j:configuration>

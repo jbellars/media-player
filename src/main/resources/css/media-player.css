@@ -1,0 +1,15 @@
+.root {
+    -white-ish: rgba(255, 255, 255, .90);
+    -black-ish: rgba(0, 0, 0, .80);
+}
+.slider {
+    -fx-show-tick-labels: false;
+    -fx-show-tick-marks: false;
+}
+.slider .axis .axis-label {
+    -fx-text-fill: white;
+}
+.media-view {
+    -fx-border-radius: 20 20 0 0;
+    -fx-background-radius: 20 20 0 0;
+}
