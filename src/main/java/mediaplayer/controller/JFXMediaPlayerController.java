@@ -583,6 +583,7 @@ public class JFXMediaPlayerController
             mediaPlayer.setOnReady(null);
             mediaPlayer.currentTimeProperty().removeListener(progressListener);
             mediaPlayer.setAudioSpectrumListener(null);
+            normalizePlaybackButtons();
         }
 
         // Set the media to the URL of the item dragged onto the player
