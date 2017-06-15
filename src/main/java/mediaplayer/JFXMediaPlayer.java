@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -70,6 +71,7 @@ public class JFXMediaPlayer extends Application
             Scene scene = new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT, Color.TRANSPARENT);
             primaryStage.setScene(scene);
             primaryStage.setTitle("JavaFX Media Player");
+            primaryStage.getIcons().add(new Image("/images/media-player-icon.png"));
             primaryStage.initStyle(StageStyle.DECORATED);
             primaryStage.centerOnScreen();
 
