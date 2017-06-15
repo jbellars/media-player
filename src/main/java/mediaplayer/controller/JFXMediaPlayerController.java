@@ -276,20 +276,6 @@ public class JFXMediaPlayerController
                     {
                         filePath = db.getFiles().get(0).toURI().toURL().toString();
                         playMedia(filePath);
-                        if (filePath.endsWith(".mp4"))
-                        {
-                            mediaPlayer.setOnError(()->
-                                    System.out.println("media error: "+mediaPlayer.getError().toString()));
-                            logger.info("Video file loaded.");
-                        }
-                        else if (filePath.endsWith(".mp3"))
-                        {
-                            logger.info("Audio file loaded.");
-                        }
-                        else
-                        {
-                            logger.info("Attempted to load unsupported file type.");
-                        }
                     }
                     catch (MalformedURLException ex)
                     {
@@ -574,61 +560,86 @@ public class JFXMediaPlayerController
      */
     private void playMedia(String url)
     {
-        // Initialize media player
-        if (mediaPlayer != null)
+        try
         {
-            mediaPlayer.pause();
-            mediaPlayer.setOnPaused(null);
-            mediaPlayer.setOnPlaying(null);
-            mediaPlayer.setOnReady(null);
-            mediaPlayer.currentTimeProperty().removeListener(progressListener);
-            mediaPlayer.setAudioSpectrumListener(null);
-            normalizePlaybackButtons();
+            // Initialize media player
+            if (mediaPlayer != null)
+            {
+                mediaPlayer.pause();
+                mediaPlayer.setOnPaused(null);
+                mediaPlayer.setOnPlaying(null);
+                mediaPlayer.setOnReady(null);
+                mediaPlayer.currentTimeProperty().removeListener(progressListener);
+                mediaPlayer.setAudioSpectrumListener(null);
+                normalizePlaybackButtons();
+            }
+
+            // Set the media to the URL of the item dragged onto the player
+            Media media = new Media(url);
+
+            // Create a new media player
+            mediaPlayer = new MediaPlayer(media);
+
+            // Set the mediaPlayer to display video
+            mvMediaView.setMediaPlayer(mediaPlayer);
+
+            // Listener moves the slider for progress as the media is playing
+            mediaPlayer.currentTimeProperty().addListener(progressListener);
+
+            // When media is ready, set slider to span the duration of it
+            mediaPlayer.setOnReady(() ->
+                                   {
+                                       sldSlider.setValue(0);
+                                       double mediaDurationInSeconds = mediaPlayer.getMedia().getDuration().toSeconds();
+                                       sldSlider.setMax(mediaDurationInSeconds);
+
+                                       // Bind elapsed / remaining time label
+                                       lblTimeElapsedAndRemaining.textProperty().bind(
+                                               createBindingTimeElapsedAndRemaining());
+
+                                       // Create seek points for quicker segmented navigation of media
+                                       createSeekPoints(mediaDurationInSeconds);
+
+                                       DisplayMetadata();
+
+                                       //Set appropriate icon (pause instead of play)
+                                       btnPlay.setGraphic(new ImageView("/images/pause-button.png"));
+
+                                       mediaPlayer.play();
+                                       logger.debug("Playing media at regular speed.");
+                                   });
+
+
+            // Set media back to the beginning when done
+            mediaPlayer.setOnEndOfMedia(() ->
+                                        {
+                                            mediaPlayer.stop();
+                                            logger.info("End of media reached.");
+                                            btnPlay.setGraphic(new ImageView("/images/play-button.png"));
+
+                                        });
         }
-
-        // Set the media to the URL of the item dragged onto the player
-        Media media = new Media(url);
-
-        // Create a new media player
-        mediaPlayer = new MediaPlayer(media);
-
-        // Set the mediaPlayer to display video
-        mvMediaView.setMediaPlayer(mediaPlayer);
-
-        // Listener moves the slider for progress as the media is playing
-        mediaPlayer.currentTimeProperty().addListener(progressListener);
-
-        // When media is ready, set slider to span the duration of it
-        mediaPlayer.setOnReady(() ->
+        catch (Exception ex)
         {
-            sldSlider.setValue(0);
-            double mediaDurationInSeconds = mediaPlayer.getMedia().getDuration().toSeconds();
-            sldSlider.setMax(mediaDurationInSeconds);
-
-            // Bind elapsed / remaining time label
-            lblTimeElapsedAndRemaining.textProperty().bind(createBindingTimeElapsedAndRemaining());
-
-            // Create seek points for quicker segmented navigation of media
-            createSeekPoints(mediaDurationInSeconds);
-
-            DisplayMetadata();
-
-            //Set appropriate icon (pause instead of play)
-            btnPlay.setGraphic(new ImageView("/images/pause-button.png"));
-
-            mediaPlayer.play();
-            logger.debug("Playing media at regular speed.");
-        });
-
-
-        // Set media back to the beginning when done
-        mediaPlayer.setOnEndOfMedia(() ->
-        {
-            mediaPlayer.stop();
-            logger.info("End of media reached.");
-            btnPlay.setGraphic(new ImageView("/images/play-button.png"));
-
-        });
+            if (url.endsWith(".mp4"))
+            {
+                mediaPlayer.setOnError(()->
+                                               System.out.println("media error: "+mediaPlayer.getError().toString()));
+                logger.info("Failed to play mp4 file.");
+            }
+            else if (url.endsWith(".mp3"))
+            {
+                logger.info("Failed to play audio file.");
+            }
+            else if (url.endsWith(".srt"))
+            {
+                logger.info("Failed to load subtitle file.");
+            }
+            else
+            {
+                logger.info("Attempted to load unsupported file type.");
+            }
+        }
 
     }
 
